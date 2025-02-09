@@ -18,7 +18,6 @@ API_SECRET = os.getenv("API_SECRET")
 client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
 class BollingerBands:
-
     def __init__(self, 
                  symbol, 
                  limit = 50,
@@ -90,6 +89,8 @@ class BollingerBands:
 
         fig.update_layout(
             title="Bollinger Bands Visualization",
+            width=1100,
+            height=690,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1)

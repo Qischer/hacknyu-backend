@@ -87,7 +87,7 @@ class ParabolicSAR:
         fig.add_trace(go.Scatter(x=time, y=arrL, mode="lines", name="Parabolic SAR", line=dict(color="black", dash="dash")))
 
         fig.update_layout(
-            title="Parabolic SAR (Stop and Reverse) Visualization",
+            title="Parabolic SAR (Stop and Reverse) Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

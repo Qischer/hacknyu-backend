@@ -134,7 +134,7 @@ class AverageDirectionalMovement:
             yaxis2_title="Price",
             yaxis_title="ADX / DI",
             showlegend=True,
-            title="Stock Price and Average Directional Movement Index (ADX)",
+            title="Stock Price and Average Directional Movement Index (ADX) - " + self.symbol,
             width=1100,
             height=690
         )

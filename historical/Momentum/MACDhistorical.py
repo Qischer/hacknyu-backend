@@ -146,7 +146,7 @@ class MovingAverageCD:
             yaxis2_title="Price",
             yaxis_title="MACDEXT",
             showlegend=True,
-            title="Moving Average Convergence/Divergence",
+            title="Moving Average Convergence/Divergence - " + self.symbol,
             width=1100,
             height=690
         )

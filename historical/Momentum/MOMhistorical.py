@@ -144,7 +144,7 @@ class Momentum:
             yaxis2_title="Price",
             yaxis_title="MOMENTUM",
             showlegend=True,
-            title="Momentum",
+            title="Momentum - " + self.symbol,
             width=1100,
             height=690
         )

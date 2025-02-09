@@ -78,7 +78,7 @@ class DoubleExponentialMovingAverage:
         fig.add_trace(go.Scatter(x=time, y=dema, mode="lines", name="DEMA", line=dict(color="red", dash="dot")))
 
         fig.update_layout(
-            title="Double Exponential Moving Average Visualization",
+            title="Double Exponential Moving Average Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

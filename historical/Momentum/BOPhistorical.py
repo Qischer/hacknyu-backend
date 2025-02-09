@@ -140,7 +140,7 @@ class BalanceOfPower:
             yaxis2_title="Price",
             yaxis_title="BOP",
             showlegend=True,
-            title="Stock Price and Balance of Power (BOP)",
+            title="Stock Price and Balance of Power (BOP) - " + self.symbol,
             width=1100,
             height=690
         )

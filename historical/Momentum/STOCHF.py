@@ -151,7 +151,7 @@ class StochasticFast:
             yaxis2_title="Price",
             yaxis_title="Stochastic's",
             showlegend=True,
-            title="Stochastic Fast",
+            title="Stochastic Fast - " + self.symbol,
             width=1100,
             height=690
         )

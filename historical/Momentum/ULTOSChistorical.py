@@ -151,7 +151,7 @@ class UltimateOscillator:
             yaxis2_title="Price",
             yaxis_title="Ultimate Oscillator",
             showlegend=True,
-            title="Ultimate Oscillator",
+            title="Ultimate Oscillator - " + self.symbol,
             width=1100,
             height=690
         )

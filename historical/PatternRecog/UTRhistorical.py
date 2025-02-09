@@ -145,7 +145,7 @@ class UTR:
         )
 
         fig.update_layout(
-            title="Three Unique Rivers Visualization",
+            title="Three Unique Rivers Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

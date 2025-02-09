@@ -144,7 +144,7 @@ class PP:
         )
 
         fig.update_layout(
-            title="Piercing Pattern Visualization",
+            title="Piercing Pattern Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

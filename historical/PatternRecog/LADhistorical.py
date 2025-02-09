@@ -144,7 +144,7 @@ class LAD:
         )
 
         fig.update_layout(
-            title="Ladder Bottom Visualization",
+            title="Ladder Bottom Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

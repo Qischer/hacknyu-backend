@@ -145,7 +145,7 @@ class HAM:
         )
 
         fig.update_layout(
-            title="Hammer Pattern Visualization",
+            title="Hammer Pattern Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

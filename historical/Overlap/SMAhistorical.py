@@ -127,7 +127,7 @@ class SimpleMovingAvg:
         )
 
         fig.update_layout(
-            title="Simple Moving Average Visualization",
+            title="Simple Moving Average Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

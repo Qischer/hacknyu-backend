@@ -145,7 +145,7 @@ class TWS:
         )
 
         fig.update_layout(
-            title="Triple Advancing White Soilder Visualization",
+            title="Triple Advancing White Soilder Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

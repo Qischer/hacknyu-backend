@@ -145,7 +145,7 @@ class RelativeStrengthIndex:
             yaxis2_title="Price",
             yaxis_title="Relative Strength Index",
             showlegend=True,
-            title="Relative Strength Index",
+            title="Relative Strength Index - " + self.symbol,
             width=1100,
             height=690
         )

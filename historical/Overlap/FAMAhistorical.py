@@ -84,7 +84,7 @@ class MESAAdaptiveMovingAverage:
         fig.add_trace(go.Scatter(x=time, y=fama, mode="lines", name="Follow-up Adaptive Moving Average", line=dict(color="green", dash="dot")))
 
         fig.update_layout(
-            title="MESA Adaptive Moving Average Visualization",
+            title="MESA Adaptive Moving Average Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

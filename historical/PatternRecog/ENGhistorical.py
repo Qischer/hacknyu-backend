@@ -145,7 +145,7 @@ class ENG:
         )
 
         fig.update_layout(
-            title="Engulfing Pattern Visualization",
+            title="Engulfing Pattern Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

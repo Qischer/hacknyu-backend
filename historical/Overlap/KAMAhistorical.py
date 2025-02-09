@@ -80,7 +80,7 @@ class KaufmanAdaptiveMovingAverage:
         fig.add_trace(go.Scatter(x=time, y=kama, mode="lines", name="Kaufman Adaptive Moving Average", line=dict(color="red", dash="dot")))
 
         fig.update_layout(
-            title="Kaufman Adaptive Moving Average Visualization",
+            title="Kaufman Adaptive Moving Average Visualization - " + self.symbol,
             xaxis_title="Time",
             yaxis_title="Price",
             legend=dict(x=0, y=1),

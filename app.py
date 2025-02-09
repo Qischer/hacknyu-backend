@@ -33,31 +33,41 @@ def bollinger_band():
 @app.route('/sar', methods=['GET'])
 def parabolic_sar():
     symbol = request.args.get("symbol")
-    model = ParabolicSAR(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = ParabolicSAR(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/sma', methods=['GET'])
 def simple_moving_avg():
     symbol = request.args.get("symbol")
-    model = SimpleMovingAvg(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = SimpleMovingAvg(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/fama', methods=['GET'])
 def MESA_adaptive_moving_avg():
     symbol = request.args.get("symbol")
-    model = MESAAdaptiveMovingAverage(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = MESAAdaptiveMovingAverage(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/kama', methods=['GET'])
 def kaufman_adaptive_moving_avg():
     symbol = request.args.get("symbol")
-    model = KaufmanAdaptiveMovingAverage(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = KaufmanAdaptiveMovingAverage(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/dema', methods=['GET'])
 def double_exp_moving_avg():
     symbol = request.args.get("symbol")
-    model = DoubleExponentialMovingAverage(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = DoubleExponentialMovingAverage(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 ## Pattern recog
@@ -65,43 +75,57 @@ def double_exp_moving_avg():
 @app.route('/eng', methods=['GET'])
 def eng():
     symbol = request.args.get("symbol")
-    model = ENG(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = ENG(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/ham', methods=['GET'])
 def ham():
     symbol = request.args.get("symbol")
-    model = HAM(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = HAM(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/lad', methods=['GET'])
 def lad():
     symbol = request.args.get("symbol")
-    model = LAD(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = LAD(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/ms', methods=['GET'])
 def ms():
     symbol = request.args.get("symbol")
-    model = MS(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = MS(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/pp', methods=['GET'])
 def pp():
     symbol = request.args.get("symbol")
-    model = PP(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = PP(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/tws', methods=['GET'])
 def tws():
     symbol = request.args.get("symbol")
-    model = TWS(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = TWS(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/utr', methods=['GET'])
 def utr():
     symbol = request.args.get("symbol")
-    model = UTR(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = UTR(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 ## Momentum
@@ -109,43 +133,57 @@ def utr():
 @app.route('/adx', methods=['GET'])
 def adx():
     symbol = request.args.get("symbol")
-    model = AverageDirectionalMovement(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = AverageDirectionalMovement(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/bop', methods=['GET'])
 def bop():
     symbol = request.args.get("symbol")
-    model = BalanceOfPower(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = BalanceOfPower(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/mac', methods=['GET'])
 def mac():
     symbol = request.args.get("symbol")
-    model = MovingAverageCD(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = MovingAverageCD(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/mom', methods=['GET'])
 def mom():
     symbol = request.args.get("symbol")
-    model = Momentum(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = Momentum(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/rsi', methods=['GET'])
 def rsi():
     symbol = request.args.get("symbol")
-    model = RelativeStrengthIndex(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = RelativeStrengthIndex(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/stocf', methods=['GET'])
 def stocf():
     symbol = request.args.get("symbol")
-    model = StochasticFast(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = StochasticFast(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 @app.route('/ultos', methods=['GET'])
 def ultos():
     symbol = request.args.get("symbol")
-    model = UltimateOscillator(symbol=symbol)
+    start = request.args.get("start")
+    end = request.args.get("end")
+    model = UltimateOscillator(symbol=symbol, start=start, end=end)
     return model.generate_chart()
 
 if __name__ == '__main__':

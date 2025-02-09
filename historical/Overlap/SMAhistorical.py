@@ -37,7 +37,7 @@ class SimpleMovingAvg:
         barsReq = StockBarsRequest(
             symbol_or_symbols=self.symbol,
             timeframe=TimeFrame(1, TimeFrame.Minute),
-            sstart=datetime.datetime.strptime(self.start, '%Y-%m-%d'),
+            start=datetime.datetime.strptime(self.start, '%Y-%m-%d'),
             end=datetime.datetime.strptime(self.end, '%Y-%m-%d'),
             limit=self.limit
         )

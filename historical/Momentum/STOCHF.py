@@ -23,19 +23,23 @@ class StochasticFast:
                  symbol,
                  limit = 50,
                  fastKFrame = 5,
-                 fastDFrame = 3) -> None:
+                 fastDFrame = 3,
+                 start = "2024-02-01",
+                 end = "2024-02-02") -> None:
 
         self.symbol = symbol
         self.limit = limit
         self.fastKFrame = fastKFrame
         self.fastDFrame = fastDFrame
+        self.start = start
+        self.end = end
 
     def generate_chart(self):
         barsReq = StockBarsRequest(
             symbol_or_symbols=self.symbol,
             timeframe=TimeFrame(1, TimeFrame.Minute),
-            start=datetime.datetime(2024, 2, 1, 10),
-            end=datetime.datetime(2024, 2, 2, 20),
+            start=datetime.datetime.strptime(self.start, '%Y-%m-%d'),
+            end=datetime.datetime.strptime(self.end, '%Y-%m-%d'),
             limit=self.limit
         )
 

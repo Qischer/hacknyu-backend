@@ -39,7 +39,7 @@ class BollingerBands:
         barsReq = StockBarsRequest(
             symbol_or_symbols=self.symbol,
             timeframe=TimeFrame(1, TimeFrame.Minute),
-            start =datetime.datetime.strptime(self.start, '%Y-%m-%d'),
+            start=datetime.datetime.strptime(self.start, '%Y-%m-%d'),
             end=datetime.datetime.strptime(self.end, '%Y-%m-%d'),
             limit=self.limit
         )
@@ -64,8 +64,6 @@ class BollingerBands:
                     highVar.append(data_point.high)
                     lowVar.append(data_point.low)
                     closeVar.append(data_point.close)
-                    # DTM = data_point.timestamp
-                    # time.append(int(DTM.minute) + int(DTM.hour) * (60))
                     time.append(data_point.timestamp)
 
 

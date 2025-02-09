@@ -22,18 +22,22 @@ class Momentum:
     def __init__(self, 
                  symbol,
                  limit = 50,
-                 timeFrame = 5) -> None:
+                 timeFrame = 5,
+                 start = "2024-02-01",
+                 end = "2024-02-02") -> None:
 
         self.symbol = symbol
         self.limit = limit
         self.timeFrame = timeFrame
+        self.start = start
+        self.end = end
 
     def generate_chart(self):
         barsReq = StockBarsRequest(
             symbol_or_symbols=self.symbol,
             timeframe=TimeFrame(1, TimeFrame.Minute),
-            start=datetime.datetime(2024, 2, 1, 10),
-            end=datetime.datetime(2024, 2, 2, 20),
+            start =datetime.datetime.strptime(self.start, '%Y-%m-%d'),
+            end=datetime.datetime.strptime(self.end, '%Y-%m-%d'),
             limit=self.limit
         )
 

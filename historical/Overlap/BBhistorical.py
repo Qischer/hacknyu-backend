@@ -40,7 +40,6 @@ class BollingerBands:
             limit=self.limit
         )
 
-        # Define request
         stockBars = client.get_stock_bars(barsReq)
 
         mid = []
@@ -60,12 +59,10 @@ class BollingerBands:
                     highVar.append(data_point.high)
                     lowVar.append(data_point.low)
                     closeVar.append(data_point.close)
-                    # DTM = data_point.timestamp
-                    # time.append(int(DTM.minute) + int(DTM.hour) * (60))
                     time.append(data_point.timestamp)
 
 
-        candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
+        fig = go.Figure(data=[go.Candlestick(x=time,
                         open=openVar,
                         high=highVar,
                         low=lowVar,
@@ -78,8 +75,6 @@ class BollingerBands:
         stdDown = self.stdDown
 
         upperband, middleband, lowerband = talib.BBANDS(arr, timeperiod=smaTime, nbdevup=stdUp, nbdevdn=stdDown, matype=0)
-
-        fig = go.Figure(data=candlestick_fig.data)
 
         fig.add_trace(go.Scatter(x=time, y=arr, mode="lines", name="Price", line=dict(color="blue")))
 
@@ -95,7 +90,6 @@ class BollingerBands:
             yaxis_title="Price",
             legend=dict(x=0, y=1)
         )
-
 
         cash = 100000
         stocks = 0
@@ -120,20 +114,18 @@ class BollingerBands:
                 stocks += amt
                 cash -= amt * mid[i]
                 dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
-                # print(f"We bought {amt} stocks for {mid[i]} on {i} because the {lowerband[i]} value")
                 buy = True
             elif(middleband[i] != np.nan and mid[i] >= upperband[i] and (stocks >= amt) and (repeat or buy)):
                 cash += amt * mid[i]
                 stocks -= amt
                 dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
-                # print(f"We sold {amt} stocks for {mid[i]} on {i} because the {upperband[i]} value")
                 buy = False
 
         fig.add_scatter(
             x=dfBuy["x"],
             y=dfBuy["y"],
             mode="markers",
-            marker=dict(size=10, color=dfBuy["color"]),  # Use the custom colors
+            marker=dict(size=10, color=dfBuy["color"]),
             name="Buy"
         )
 
@@ -141,11 +133,9 @@ class BollingerBands:
             x=dfSell["x"],
             y=dfSell["y"],
             mode="markers",
-            marker=dict(size=10, color=dfSell["color"]),  # Use the custom colors
+            marker=dict(size=10, color=dfSell["color"]),
             name="Sell"
         )
-
-        total = cash + stocks * mid[-1]
 
         obj = pio.to_json(fig)
         return obj

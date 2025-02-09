@@ -20,26 +20,31 @@ client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 class BollingerBands:
     def __init__(self, 
                  symbol, 
-                 limit = 50,
+                 limit = 200,
                  smaTime = 5,
                  stdUp = 1,
-                 stdDown = 1) -> None:
+                 stdDown = 1,
+                 start = "2024-02-01",
+                 end = "2024-02-02") -> None:
 
         self.symbol = symbol
         self.limit = limit
         self.smaTime = smaTime
         self.stdUp = stdUp
         self.stdDown = stdDown
+        self.start = start
+        self.end = end
 
     def generate_chart(self):
         barsReq = StockBarsRequest(
             symbol_or_symbols=self.symbol,
             timeframe=TimeFrame(1, TimeFrame.Minute),
-            start=datetime.datetime(2024, 2, 1, 10),
-            end=datetime.datetime(2024, 2, 2, 20),
+            start =datetime.datetime.strptime(self.start, '%Y-%m-%d'),
+            end=datetime.datetime.strptime(self.end, '%Y-%m-%d'),
             limit=self.limit
         )
 
+        # Define request
         stockBars = client.get_stock_bars(barsReq)
 
         mid = []
@@ -59,15 +64,16 @@ class BollingerBands:
                     highVar.append(data_point.high)
                     lowVar.append(data_point.low)
                     closeVar.append(data_point.close)
+                    # DTM = data_point.timestamp
+                    # time.append(int(DTM.minute) + int(DTM.hour) * (60))
                     time.append(data_point.timestamp)
 
 
-        fig = go.Figure(data=[go.Candlestick(x=time,
+        candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
                         open=openVar,
                         high=highVar,
                         low=lowVar,
-                        close=closeVar,
-                        name="Stock Price")])
+                        close=closeVar)])
 
         arr = np.array(mid)
 
@@ -76,6 +82,8 @@ class BollingerBands:
         stdDown = self.stdDown
 
         upperband, middleband, lowerband = talib.BBANDS(arr, timeperiod=smaTime, nbdevup=stdUp, nbdevdn=stdDown, matype=0)
+
+        fig = go.Figure(data=candlestick_fig.data)
 
         fig.add_trace(go.Scatter(x=time, y=arr, mode="lines", name="Price", line=dict(color="blue")))
 
@@ -91,6 +99,7 @@ class BollingerBands:
             yaxis_title="Price",
             legend=dict(x=0, y=1)
         )
+
 
         cash = 100000
         stocks = 0
@@ -115,18 +124,20 @@ class BollingerBands:
                 stocks += amt
                 cash -= amt * mid[i]
                 dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
+                # print(f"We bought {amt} stocks for {mid[i]} on {i} because the {lowerband[i]} value")
                 buy = True
             elif(middleband[i] != np.nan and mid[i] >= upperband[i] and (stocks >= amt) and (repeat or buy)):
                 cash += amt * mid[i]
                 stocks -= amt
                 dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
+                # print(f"We sold {amt} stocks for {mid[i]} on {i} because the {upperband[i]} value")
                 buy = False
 
         fig.add_scatter(
             x=dfBuy["x"],
             y=dfBuy["y"],
             mode="markers",
-            marker=dict(size=10, color=dfBuy["color"]),
+            marker=dict(size=10, color=dfBuy["color"]),  # Use the custom colors
             name="Buy"
         )
 
@@ -134,21 +145,11 @@ class BollingerBands:
             x=dfSell["x"],
             y=dfSell["y"],
             mode="markers",
-            marker=dict(size=10, color=dfSell["color"]),
+            marker=dict(size=10, color=dfSell["color"]),  # Use the custom colors
             name="Sell"
         )
 
         total = cash + stocks * mid[-1]
-        fig.add_annotation(
-            text=(f"started with {100000} got to {total} ended with {stocks} stocks and {cash} cash"),
-            x=1,  # x position (0 to 1)
-            y=1,  # y position (0 to 1)
-            xref="paper",  # Position relative to the whole figure (not data points)
-            yref="paper",  # Position relative to the whole figure (not data points)
-            showarrow=False,  # No arrow
-            font=dict(size=14, color="black"),  # Customize font size and color
-            align="right"  # Right-align the text
-        )
 
         obj = pio.to_json(fig)
         return obj

@@ -17,7 +17,7 @@ API_SECRET = os.getenv("API_SECRET")
 
 client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
-class PP:
+class UTR:
     def __init__(self, 
                  symbol,
                  limit = 50,

@@ -19,11 +19,11 @@ client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
 
 barsReq = StockBarsRequest(
-    symbol_or_symbols="MSFT",
+    symbol_or_symbols="NRG",
     timeframe=TimeFrame(1, TimeFrame.Minute),
-    start=datetime.datetime(2024, 2, 1, 10),
-    end=datetime.datetime(2024, 2, 2, 20),
-    limit=50
+    start=datetime.datetime(2024, 2, 1),
+    end=datetime.datetime(2024, 5, 10),
+    limit=1000
 )
 
 # Define request
@@ -59,23 +59,20 @@ candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
 
 arr = np.array(mid)
 
-smaTime = 5
-stdUp = 1
-stdDown = 1
+fastLim = 0.5
+slowLim = 0.05
 
-upperband, middleband, lowerband = talib.BBANDS(arr, timeperiod=smaTime, nbdevup=stdUp, nbdevdn=stdDown, matype=0)
+mama, fama = talib.MAMA(arr, fastlimit=fastLim, slowlimit=slowLim)
 
 fig = go.Figure(data=candlestick_fig.data)
 
 fig.add_trace(go.Scatter(x=time, y=arr, mode="lines", name="Price", line=dict(color="blue")))
 
-
-fig.add_trace(go.Scatter(x=time, y=upperband, mode="lines", name="Upper Band", line=dict(color="red", dash="dot")))
-fig.add_trace(go.Scatter(x=time, y=middleband, mode="lines", name="Middle Band (SMA)", line=dict(color="black", dash="dash")))
-fig.add_trace(go.Scatter(x=time, y=lowerband, mode="lines", name="Lower Band", line=dict(color="green", dash="dot")))
+fig.add_trace(go.Scatter(x=time, y=mama, mode="lines", name="MESA Adaptive Moving Average", line=dict(color="red", dash="dot")))
+fig.add_trace(go.Scatter(x=time, y=fama, mode="lines", name="Follow-up Adaptive Moving Average", line=dict(color="green", dash="dot")))
 
 fig.update_layout(
-    title="Bollinger Bands Visualization",
+    title="MESA Adaptive Moving Average Visualization",
     xaxis_title="Time",
     yaxis_title="Price",
     legend=dict(x=0, y=1)
@@ -101,17 +98,17 @@ dfSell = pandas.DataFrame({
 })
 
 for i in range(len(mid)):
-    if(middleband[i] != np.nan and mid[i] <= lowerband[i] and (cash - amt * mid[i] > 10000) and (repeat or not buy)):
+    if(mama[i] != np.nan and mama[i] >= fama[i] and (cash - amt * mid[i] > 10000) and (repeat or not buy)):
         stocks += amt
         cash -= amt * mid[i]
         dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
-        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {lowerband[i]} value")
+        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {mama[i]} value and the {fama[i]} value")
         buy = True
-    elif(middleband[i] != np.nan and mid[i] >= upperband[i] and (stocks >= amt) and (repeat or buy)):
+    elif(mama[i] != np.nan and mama[i] <= fama[i] and (stocks >= amt) and (repeat or buy)):
         cash += amt * mid[i]
         stocks -= amt
         dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
-        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {upperband[i]} value")
+        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {mama[i]} value and the {fama[i]} value")
         buy = False
 
 fig.add_scatter(

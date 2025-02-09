@@ -70,6 +70,8 @@ fig = go.Figure(data=candlestick_fig.data + sma_fig.data)
 cash = 100000
 stocks = 0
 amt = 100
+repeat = True
+buy = False
 
 dfBuy = pandas.DataFrame({
     "x": [],
@@ -84,16 +86,18 @@ dfSell = pandas.DataFrame({
 })
 
 for i in range(len(mid)):
-    if(smas[i] != np.nan and smas[i] > mid[i] and (cash - amt * mid[i] > 10000)):
+    if(smas[i] != np.nan and smas[i] > mid[i] and (cash - amt * mid[i] > 10000) and (repeat or not buy)):
         stocks += amt
         cash -= amt * mid[i]
         dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
         print(f"We bought {amt} stocks for {mid[i]} on {i} because the {smas[i]} value")
-    elif(smas[i] != np.nan and smas[i] < mid[i] and (stocks >= amt)):
+        buy = True
+    elif(smas[i] != np.nan and smas[i] < mid[i] and (stocks >= amt) and (repeat or buy)):
         cash += amt * mid[i]
         stocks -= amt
         dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
         print(f"We sold {amt} stocks for {mid[i]} on {i} because the {smas[i]} value")
+        buy = False
 
 fig.add_scatter(
     x=dfBuy["x"],

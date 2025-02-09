@@ -17,9 +17,8 @@ API_SECRET = os.getenv("API_SECRET")
 
 client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
-
 barsReq = StockBarsRequest(
-    symbol_or_symbols="MSFT",
+    symbol_or_symbols="AMZN",
     timeframe=TimeFrame(1, TimeFrame.Minute),
     start=datetime.datetime(2024, 2, 1, 10),
     end=datetime.datetime(2024, 2, 2, 20),
@@ -57,25 +56,24 @@ candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
                 low=lowVar,
                 close=closeVar)])
 
-arr = np.array(mid)
+arrH = np.array(highVar)
+arrL = np.array(lowVar)
 
-smaTime = 5
-stdUp = 1
-stdDown = 1
+accl = 0.2
+max = 0.6
 
-upperband, middleband, lowerband = talib.BBANDS(arr, timeperiod=smaTime, nbdevup=stdUp, nbdevdn=stdDown, matype=0)
+sar = talib.SAR(arrH, arrL, acceleration=accl, maximum=max)
 
 fig = go.Figure(data=candlestick_fig.data)
 
-fig.add_trace(go.Scatter(x=time, y=arr, mode="lines", name="Price", line=dict(color="blue")))
+fig.add_trace(go.Scatter(x=time, y=arrH, mode="lines", name="High", line=dict(color="green")))
+fig.add_trace(go.Scatter(x=time, y=mid, mode="lines", name="Price", line=dict(color="blue")))
+fig.add_trace(go.Scatter(x=time, y=arrL, mode="lines", name="Low", line=dict(color="red")))
 
-
-fig.add_trace(go.Scatter(x=time, y=upperband, mode="lines", name="Upper Band", line=dict(color="red", dash="dot")))
-fig.add_trace(go.Scatter(x=time, y=middleband, mode="lines", name="Middle Band (SMA)", line=dict(color="black", dash="dash")))
-fig.add_trace(go.Scatter(x=time, y=lowerband, mode="lines", name="Lower Band", line=dict(color="green", dash="dot")))
+fig.add_trace(go.Scatter(x=time, y=arrL, mode="lines", name="Parabolic SAR", line=dict(color="black", dash="dash")))
 
 fig.update_layout(
-    title="Bollinger Bands Visualization",
+    title="Parabolic SAR (Stop and Reverse) Visualization",
     xaxis_title="Time",
     yaxis_title="Price",
     legend=dict(x=0, y=1)
@@ -100,18 +98,18 @@ dfSell = pandas.DataFrame({
     "color": []  
 })
 
-for i in range(len(mid)):
-    if(middleband[i] != np.nan and mid[i] <= lowerband[i] and (cash - amt * mid[i] > 10000) and (repeat or not buy)):
+for i in range(len(sar)):
+    if(sar[i] != np.nan and mid[i] >= sar[i] and (cash - amt * mid[i] > 10000) and (repeat or not buy)):
         stocks += amt
         cash -= amt * mid[i]
         dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
-        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {lowerband[i]} value")
+        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {sar[i]} value")
         buy = True
-    elif(middleband[i] != np.nan and mid[i] >= upperband[i] and (stocks >= amt) and (repeat or buy)):
+    elif(sar[i] != np.nan and mid[i] <= sar[i] and (stocks >= amt) and (repeat or buy)):
         cash += amt * mid[i]
         stocks -= amt
         dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
-        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {upperband[i]} value")
+        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {sar[i]} value")
         buy = False
 
 fig.add_scatter(
@@ -131,7 +129,6 @@ fig.add_scatter(
 )
 
 total = cash + stocks * mid[-1]
-
 
 print(f"started with {100000} got to {total} ended with {stocks} stocks and {cash} cash")
 fig.show()

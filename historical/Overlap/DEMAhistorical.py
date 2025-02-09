@@ -61,7 +61,8 @@ class DoubleExponentialMovingAverage:
                         open=openVar,
                         high=highVar,
                         low=lowVar,
-                        close=closeVar)])
+                        close=closeVar,
+                        name="Stock Price")])
 
         arr = np.array(mid)
 
@@ -77,7 +78,9 @@ class DoubleExponentialMovingAverage:
             title="Double Exponential Moving Average Visualization",
             xaxis_title="Time",
             yaxis_title="Price",
-            legend=dict(x=0, y=1)
+            legend=dict(x=0, y=1),
+            width=1100,
+            height=690
         )
 
         cash = 100000
@@ -124,6 +127,18 @@ class DoubleExponentialMovingAverage:
             mode="markers",
             marker=dict(size=10, color=dfSell["color"]), 
             name="Sell"
+        )
+
+        total = cash + stocks * mid[-1]
+        fig.add_annotation(
+            text=(f"started with {100000} got to {total} ended with {stocks} stocks and {cash} cash"),
+            x=1,  # x position (0 to 1)
+            y=1,  # y position (0 to 1)
+            xref="paper",  # Position relative to the whole figure (not data points)
+            yref="paper",  # Position relative to the whole figure (not data points)
+            showarrow=False,  # No arrow
+            font=dict(size=14, color="black"),  # Customize font size and color
+            align="right"  # Right-align the text
         )
 
         obj = pio.to_json(fig)

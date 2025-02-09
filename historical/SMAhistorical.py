@@ -17,9 +17,10 @@ API_SECRET = os.getenv("API_SECRET")
 
 client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
+stock = "AAPL"
 
 barsReq = StockBarsRequest(
-    symbol_or_symbols="AAPL",
+    symbol_or_symbols=stock,
     timeframe=TimeFrame(1, TimeFrame.Minute),
     start=datetime.datetime(2024, 2, 1, 10),
     end=datetime.datetime(2024, 2, 2, 20),
@@ -29,7 +30,7 @@ barsReq = StockBarsRequest(
 # Define request
 stockBars = client.get_stock_bars(barsReq)
 
-avgs = []
+mid = []
 openVar = []
 highVar = []
 lowVar = []
@@ -40,14 +41,16 @@ for bar in stockBars:
     data = bar[1]
     for symbol_data in data.values():
         for data_point in symbol_data:
-            avg = (data_point.high + data_point.low) / 2
-            avgs.append(avg)
+            middle = (data_point.high + data_point.low) / 2
+            mid.append(middle)
             openVar.append(data_point.open)
             highVar.append(data_point.high)
             lowVar.append(data_point.low)
             closeVar.append(data_point.close)
-            DTM = data_point.timestamp
-            time.append(int(DTM.minute) + int(DTM.hour) * (60))
+            # DTM = data_point.timestamp
+            # time.append(int(DTM.minute) + int(DTM.hour) * (60))
+            time.append(data_point.timestamp)
+
 
 candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
                 open=openVar,
@@ -55,11 +58,13 @@ candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
                 low=lowVar,
                 close=closeVar)])
 
-arr = np.array(avgs)
+arr = np.array(mid)
 
-output = talib.SMA(arr, 10)
+smaTimeFrame = 10
 
-sma_fig = px.line(x=time, y=output)
+smas = talib.SMA(arr, smaTimeFrame)
+
+sma_fig = px.line(x=time, y=smas)
 fig = go.Figure(data=candlestick_fig.data + sma_fig.data)
 
 cash = 100000
@@ -72,19 +77,17 @@ df = pandas.DataFrame({
     "color": []  
 })
 
-for i in range(len(avgs)):
-    if(output[i] != np.nan and output[i] > avgs[i] and (cash - amt * avgs[i] > 10000)):
+for i in range(len(mid)):
+    if(smas[i] != np.nan and smas[i] > mid[i] and (cash - amt * mid[i] > 10000)):
         stocks += amt
-        cash -= amt * avgs[i]
-        df.loc[len(df)] = [time[i], avgs[i], "green"]
-        print(f"We bought {amt} stocks for {avgs[i]} on {i} because the {output[i]} value")
-    elif(output[i] != np.nan and output[i] < avgs[i]):
-        cash += stocks * avgs[i]
-        stocks = 0
-        df.loc[len(df)] = [time[i], avgs[i], "red"]
-        print(f"We sold {amt} stocks for {avgs[i]} on {i} because the {output[i]} value")
-
-total = cash + stocks * avgs[-1]
+        cash -= amt * mid[i]
+        df.loc[len(df)] = [time[i], mid[i], "green"]
+        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {smas[i]} value")
+    elif(smas[i] != np.nan and smas[i] < mid[i] and (stocks >= amt)):
+        cash += amt * mid[i]
+        stocks -= amt
+        df.loc[len(df)] = [time[i], mid[i], "red"]
+        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {smas[i]} value")
 
 fig.add_scatter(
     x=df["x"],
@@ -94,6 +97,16 @@ fig.add_scatter(
     name="Buy/Sell"
 )
 
-print(f"started with {100000} got to {total}")
-# print(output)
+fig.update_layout(
+    title="Bollinger Bands Visualization",
+    xaxis_title="Time",
+    yaxis_title="Price",
+    legend=dict(x=0, y=1)
+)
+
+total = cash + stocks * mid[-1]
+
+
+print(f"started with {100000} got to {total} ended with {stocks} stocks and {cash} cash")
+# print(smas)
 fig.show()

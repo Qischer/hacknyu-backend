@@ -8,6 +8,7 @@ import numpy as np
 import talib
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import plotly.io as pio
 import pandas
 
 load_dotenv()
@@ -17,129 +18,139 @@ API_SECRET = os.getenv("API_SECRET")
 
 client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
-stock = "AMZN"
+class UltimateOscillator:
+    def __init__(self, 
+                 symbol,
+                 limit = 50,
+                 timeFrame1 = 3,
+                 timeFrame2 = 6,
+                 timeFrame3 = 9) -> None:
 
-barsReq = StockBarsRequest(
-    symbol_or_symbols=stock,
-    timeframe=TimeFrame(1, TimeFrame.Minute),
-    start=datetime.datetime(2024, 2, 1, 10),
-    end=datetime.datetime(2024, 2, 1, 20),
-    limit=50
-)
+        self.symbol = symbol
+        self.limit = limit
+        self.timeFrame1 = timeFrame1
+        self.timeFrame2 = timeFrame2
+        self.timeFrame3 = timeFrame3
 
-stockBars = client.get_stock_bars(barsReq)
+    def generate_chart(self):
+        barsReq = StockBarsRequest(
+            symbol_or_symbols=self.symbol,
+            timeframe=TimeFrame(1, TimeFrame.Minute),
+            start=datetime.datetime(2024, 2, 1, 10),
+            end=datetime.datetime(2024, 2, 1, 20),
+            limit=self.limit
+        )
 
-mid = []
-openVar = []
-highVar = []
-lowVar = []
-closeVar = []
-time = []
+        stockBars = client.get_stock_bars(barsReq)
 
-for bar in stockBars:
-    data = bar[1]
-    for symbol_data in data.values():
-        for data_point in symbol_data:
-            middle = (data_point.high + data_point.low) / 2
-            mid.append(middle)
-            openVar.append(data_point.open)
-            highVar.append(data_point.high)
-            lowVar.append(data_point.low)
-            closeVar.append(data_point.close)
-            time.append(data_point.timestamp)
+        mid = []
+        openVar = []
+        highVar = []
+        lowVar = []
+        closeVar = []
+        time = []
 
-arrH = np.array(highVar)
-arrL = np.array(lowVar)
-arrC = np.array(closeVar)
-arrO = np.array(openVar)
-arrM = np.array(mid)
+        for bar in stockBars:
+            data = bar[1]
+            for symbol_data in data.values():
+                for data_point in symbol_data:
+                    middle = (data_point.high + data_point.low) / 2
+                    mid.append(middle)
+                    openVar.append(data_point.open)
+                    highVar.append(data_point.high)
+                    lowVar.append(data_point.low)
+                    closeVar.append(data_point.close)
+                    time.append(data_point.timestamp)
 
-timeFrame1 = 3
-timeFrame2 = 6
-timeFrame3 = 9
+        arrH = np.array(highVar)
+        arrL = np.array(lowVar)
+        arrC = np.array(closeVar)
+        arrO = np.array(openVar)
+        arrM = np.array(mid)
 
-ultosc = talib.ULTOSC(arrH, arrL, arrC, timeperiod1=timeFrame1, timeperiod2=timeFrame2, timeperiod3=timeFrame3)
+        timeFrame1 = self.timeFrame1
+        timeFrame2 = self.timeFrame2
+        timeFrame3 = self.timeFrame3
 
-fig = make_subplots(
-    rows=2, cols=1,
-    shared_xaxes=True,
-    vertical_spacing=0.1,
-    subplot_titles=("", ""),
-    row_heights=[0.4, 0.6]
-)
+        ultosc = talib.ULTOSC(arrH, arrL, arrC, timeperiod1=timeFrame1, timeperiod2=timeFrame2, timeperiod3=timeFrame3)
 
-fig.add_trace(go.Candlestick(x=time,
-                             open=openVar,
-                             high=highVar,
-                             low=lowVar,
-                             close=closeVar,
-                             name="Stock Price"),
-              row=2, col=1)
+        fig = make_subplots(
+            rows=2, cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.1,
+            subplot_titles=("", ""),
+            row_heights=[0.4, 0.6]
+        )
 
-fig.add_trace(go.Scatter(x=time, y=ultosc, mode="lines", name="Ultimate Oscillator", line=dict(color="green")),
-              row=1, col=1)
+        fig.add_trace(go.Candlestick(x=time,
+                                    open=openVar,
+                                    high=highVar,
+                                    low=lowVar,
+                                    close=closeVar,
+                                    name="Stock Price"),
+                    row=2, col=1)
 
-line1 = [60] * len(time)
-line2 = [40] * len(time)
-fig.add_trace(go.Scatter(x=time, y=line1, mode="lines", name="Upper Threshold", line=dict(color="black", dash="dash")),
-              row=1, col=1)
-fig.add_trace(go.Scatter(x=time, y=line2, mode="lines", name="Lower Threshold", line=dict(color="black", dash="dash")),
-              row=1, col=1)
+        fig.add_trace(go.Scatter(x=time, y=ultosc, mode="lines", name="Ultimate Oscillator", line=dict(color="green")),
+                    row=1, col=1)
 
-dfBuy = pandas.DataFrame({
-    "x": [],
-    "y": [],
-    "color": []  
-})
+        line1 = [60] * len(time)
+        line2 = [40] * len(time)
+        fig.add_trace(go.Scatter(x=time, y=line1, mode="lines", name="Upper Threshold", line=dict(color="black", dash="dash")),
+                    row=1, col=1)
+        fig.add_trace(go.Scatter(x=time, y=line2, mode="lines", name="Lower Threshold", line=dict(color="black", dash="dash")),
+                    row=1, col=1)
 
-dfSell = pandas.DataFrame({
-    "x": [],
-    "y": [],
-    "color": []  
-})
+        dfBuy = pandas.DataFrame({
+            "x": [],
+            "y": [],
+            "color": []  
+        })
 
-cash = 100000
-stocks = 0
-amt = 100
-lb = 40
-ub = 60
-repeat = True
-buy = False
+        dfSell = pandas.DataFrame({
+            "x": [],
+            "y": [],
+            "color": []  
+        })
 
-for i in range(len(mid)):
-    if ultosc[i] != np.nan and ultosc[i] > ub and (cash - amt * mid[i] > 10000) and (repeat or not buy):
-        stocks += amt
-        cash -= amt * mid[i]
-        dfBuy.loc[len(dfBuy)] = [time[i], ultosc[i], "green"]
-        buy = True
-    elif ultosc[i] != np.nan and ultosc[i] < lb and (stocks >= amt) and (repeat or buy):
-        cash += amt * mid[i]
-        stocks -= amt
-        dfSell.loc[len(dfSell)] = [time[i], ultosc[i], "red"]
+        cash = 100000
+        stocks = 0
+        amt = 100
+        lb = 40
+        ub = 60
+        repeat = True
         buy = False
 
-fig.add_trace(go.Scatter(
-    x=dfBuy["x"], y=dfBuy["y"],
-    mode="markers", marker=dict(size=10, color=dfBuy["color"]),
-    name="Buy"), row=1, col=1)
+        for i in range(len(mid)):
+            if ultosc[i] != np.nan and ultosc[i] > ub and (cash - amt * mid[i] > 10000) and (repeat or not buy):
+                stocks += amt
+                cash -= amt * mid[i]
+                dfBuy.loc[len(dfBuy)] = [time[i], ultosc[i], "green"]
+                buy = True
+            elif ultosc[i] != np.nan and ultosc[i] < lb and (stocks >= amt) and (repeat or buy):
+                cash += amt * mid[i]
+                stocks -= amt
+                dfSell.loc[len(dfSell)] = [time[i], ultosc[i], "red"]
+                buy = False
 
-fig.add_trace(go.Scatter(
-    x=dfSell["x"], y=dfSell["y"],
-    mode="markers", marker=dict(size=10, color=dfSell["color"]),
-    name="Sell"), row=1, col=1)
+        fig.add_trace(go.Scatter(
+            x=dfBuy["x"], y=dfBuy["y"],
+            mode="markers", marker=dict(size=10, color=dfBuy["color"]),
+            name="Buy"), row=1, col=1)
 
-fig.update_layout(
-    xaxis_title="Time",
-    yaxis2_title="Price",
-    yaxis_title="Ultimate Oscillator",
-    showlegend=True,
-    title="Ultimate Oscillator",
-)
+        fig.add_trace(go.Scatter(
+            x=dfSell["x"], y=dfSell["y"],
+            mode="markers", marker=dict(size=10, color=dfSell["color"]),
+            name="Sell"), row=1, col=1)
 
-fig.update_yaxes(range=[0, 100], row=1, col=1)
+        fig.update_layout(
+            xaxis_title="Time",
+            yaxis2_title="Price",
+            yaxis_title="Ultimate Oscillator",
+            showlegend=True,
+            title="Ultimate Oscillator",
+        )
 
-total = cash + stocks * mid[-1]
+        fig.update_yaxes(range=[0, 100], row=1, col=1)
 
-print(f"started with {100000} got to {total} ended with {stocks} stocks and {cash} cash")
-
-fig.show()
+        obj = pio.to_json(fig)
+        return obj

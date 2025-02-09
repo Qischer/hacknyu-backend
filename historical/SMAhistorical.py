@@ -71,7 +71,13 @@ cash = 100000
 stocks = 0
 amt = 100
 
-df = pandas.DataFrame({
+dfBuy = pandas.DataFrame({
+    "x": [],
+    "y": [],
+    "color": []  
+})
+
+dfSell = pandas.DataFrame({
     "x": [],
     "y": [],
     "color": []  
@@ -81,24 +87,32 @@ for i in range(len(mid)):
     if(smas[i] != np.nan and smas[i] > mid[i] and (cash - amt * mid[i] > 10000)):
         stocks += amt
         cash -= amt * mid[i]
-        df.loc[len(df)] = [time[i], mid[i], "green"]
+        dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
         print(f"We bought {amt} stocks for {mid[i]} on {i} because the {smas[i]} value")
     elif(smas[i] != np.nan and smas[i] < mid[i] and (stocks >= amt)):
         cash += amt * mid[i]
         stocks -= amt
-        df.loc[len(df)] = [time[i], mid[i], "red"]
+        dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
         print(f"We sold {amt} stocks for {mid[i]} on {i} because the {smas[i]} value")
 
 fig.add_scatter(
-    x=df["x"],
-    y=df["y"],
+    x=dfBuy["x"],
+    y=dfBuy["y"],
     mode="markers",
-    marker=dict(size=10, color=df["color"]),  # Use the custom colors
-    name="Buy/Sell"
+    marker=dict(size=10, color=dfBuy["color"]),  # Use the custom colors
+    name="Buy"
+)
+
+fig.add_scatter(
+    x=dfSell["x"],
+    y=dfSell["y"],
+    mode="markers",
+    marker=dict(size=10, color=dfSell["color"]),  # Use the custom colors
+    name="Sell"
 )
 
 fig.update_layout(
-    title="Bollinger Bands Visualization",
+    title="Simple Moving Average Visualization",
     xaxis_title="Time",
     yaxis_title="Price",
     legend=dict(x=0, y=1)

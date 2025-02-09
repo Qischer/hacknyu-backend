@@ -19,7 +19,7 @@ client = StockHistoricalDataClient(API_KEY,  API_SECRET)
 
 
 barsReq = StockBarsRequest(
-    symbol_or_symbols="MSFT",
+    symbol_or_symbols="GOOG",
     timeframe=TimeFrame(1, TimeFrame.Minute),
     start=datetime.datetime(2024, 2, 1, 10),
     end=datetime.datetime(2024, 2, 2, 20),
@@ -60,22 +60,18 @@ candlestick_fig = go.Figure(data=[go.Candlestick(x=time,
 arr = np.array(mid)
 
 smaTime = 5
-stdUp = 1
-stdDown = 1
 
-upperband, middleband, lowerband = talib.BBANDS(arr, timeperiod=smaTime, nbdevup=stdUp, nbdevdn=stdDown, matype=0)
+dema = talib.DEMA(arr, timeperiod=smaTime)
 
 fig = go.Figure(data=candlestick_fig.data)
 
 fig.add_trace(go.Scatter(x=time, y=arr, mode="lines", name="Price", line=dict(color="blue")))
 
 
-fig.add_trace(go.Scatter(x=time, y=upperband, mode="lines", name="Upper Band", line=dict(color="red", dash="dot")))
-fig.add_trace(go.Scatter(x=time, y=middleband, mode="lines", name="Middle Band (SMA)", line=dict(color="black", dash="dash")))
-fig.add_trace(go.Scatter(x=time, y=lowerband, mode="lines", name="Lower Band", line=dict(color="green", dash="dot")))
+fig.add_trace(go.Scatter(x=time, y=dema, mode="lines", name="DEMA", line=dict(color="red", dash="dot")))
 
 fig.update_layout(
-    title="Bollinger Bands Visualization",
+    title="Double Exponential Moving Average Visualization",
     xaxis_title="Time",
     yaxis_title="Price",
     legend=dict(x=0, y=1)
@@ -99,16 +95,16 @@ dfSell = pandas.DataFrame({
 })
 
 for i in range(len(mid)):
-    if(middleband[i] != np.nan and mid[i] <= lowerband[i] and (cash - amt * mid[i] > 10000)):
+    if(dema[i] != np.nan and mid[i] >= dema[i] and (cash - amt * mid[i] > 10000)):
         stocks += amt
         cash -= amt * mid[i]
         dfBuy.loc[len(dfBuy)] = [time[i], mid[i], "green"]
-        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {lowerband[i]} value")
-    elif(middleband[i] != np.nan and mid[i] >= upperband[i] and (stocks >= amt)):
+        print(f"We bought {amt} stocks for {mid[i]} on {i} because the {dema[i]} value")
+    elif(dema[i] != np.nan and mid[i] <= dema[i] and (stocks >= amt)):
         cash += amt * mid[i]
         stocks -= amt
         dfSell.loc[len(dfSell)] = [time[i], mid[i], "red"]
-        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {upperband[i]} value")
+        print(f"We sold {amt} stocks for {mid[i]} on {i} because the {dema[i]} value")
 
 fig.add_scatter(
     x=dfBuy["x"],

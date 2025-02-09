@@ -24,6 +24,7 @@ pip-selfcheck.json
 .venv/
 venv/
 env/
+.env
 ENV/
 *.log
 

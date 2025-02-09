@@ -84,7 +84,7 @@ class BollingerBands:
         fig.add_trace(go.Scatter(x=time, y=lowerband, mode="lines", name="Lower Band", line=dict(color="green", dash="dot")))
 
         fig.update_layout(
-            title="Bollinger Bands Visualization",
+            title="Bollinger Bands Visualization - " + self.symbol,
             width=1100,
             height=690,
             xaxis_title="Time",
